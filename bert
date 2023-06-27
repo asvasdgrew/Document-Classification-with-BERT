@@ -1,0 +1,18 @@
+from transformers import BertTokenizer, TFBertForSequenceClassification
+import tensorflow as tf
+
+# Load the pre-trained BERT model and tokenizer
+model_name = 'bert-base-uncased'
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = TFBertForSequenceClassification.from_pretrained(model_name)
+
+# Tokenize and encode the text
+text = "This is a document that needs to be classified."
+encoded_input = tokenizer.encode_plus(text, add_special_tokens=True, padding='max_length',
+                                      max_length=128, return_tensors='tf')
+
+# Make a prediction
+logits = model(encoded_input['input_ids'], token_type_ids=encoded_input['token_type_ids'])[0]
+predicted_class = tf.argmax(logits, axis=1).numpy()[0]
+
+print("Predicted class:", predicted_class)
